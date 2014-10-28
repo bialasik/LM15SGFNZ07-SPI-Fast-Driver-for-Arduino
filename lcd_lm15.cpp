@@ -7,10 +7,8 @@
 
 unsigned char lcdXpos = 0;        // x cursor position for LCD
 unsigned char lcdYpos = 0;        // y cursor position for LCD
-unsigned int fgColor = 0x0F00;    // foreground color for LCD (xRGB)
-unsigned int bgColor = 0x0FFF;    // background color for LCD (xRGB)
 
-unsigned char initData_lm15[] = { 
+prog_uchar initData_lm15[] PROGMEM = { 
 0xF4 , 0x90 , 0xB3 , 0xA0 , 0xD0,  0xF0 , 0xE2 , 0xD4 , 0x70 , 0x66 , 
 0xB2 , 0xBA , 0xA1 , 0xA3 , 0xAB , 0x94 , 0x95 , 0x95 , 0x95 , 0xF5 , 
 0x90,  0xF1 , 0x00 , 0x10 , 0x22 , 0x30 , 0x45 , 0x50 , 0x68 , 0x70 , 
@@ -26,8 +24,7 @@ unsigned char initData_lm15[] = {
 0xF4 , 0x08 , 0x11 , 0x2B , 0x31 , 0x4F , 0x51 , 0x80 , 0x94, 0xF5 , 
 0xA2 , 0xF4 , 0x60 , 0xF0 , 0x40 , 0x50 , 0xC0 , 0xF4 , 0x70 }; 
 
-unsigned char charMap[] = {   // text font for LCD
-
+prog_uchar charMap[] PROGMEM = {   // text font for LCD
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 32: Space
 0x00, 0x00, 0x00, 0x18, 0x3c, 0x3c, 0x3c, 0x18, 0x18, 0x00, 0x18, 0x18, 0x00, 0x00,
 0x00, 0x66, 0x66, 0x66, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -126,9 +123,7 @@ unsigned char charMap[] = {   // text font for LCD
 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x38, 0x6c, 0xc6, 0xc6, 0xfe, 0x00, 0x00, 0x00
 };
 
-
-void setContrast_LM15(unsigned char contrast) 
-{ 
+void setContrast_LM15(unsigned char contrast) { 
   digitalWrite(cdPin, HIGH); 
   digitalWrite(csPin, LOW); 
 
@@ -139,8 +134,7 @@ void setContrast_LM15(unsigned char contrast)
   digitalWrite(csPin, HIGH); 
 } 
 
-void window_LM15(unsigned char xstart, unsigned char ystart, unsigned char xend, unsigned char yend) 
-{ 
+void window_LM15(unsigned char xstart, unsigned char ystart, unsigned char xend, unsigned char yend) { 
    xstart <<= 1; 
    xstart += 6; 
    xend <<= 1; 
@@ -162,18 +156,17 @@ void window_LM15(unsigned char xstart, unsigned char ystart, unsigned char xend,
    digitalWrite(cdPin, LOW);      
 } 
 
-void cursor_LM15(unsigned char row, unsigned char col) 
-{ 
+void cursor_LM15(unsigned char row, unsigned char col) { 
    window_LM15(col, row, 100, 79); 
 }
 
-void clearLCD_LM15(void) 
-{      
+void clearLCD_LM15(void) {      
    unsigned int i; 
-
+   
+   setCursorLCD_LM15(0,0); 
    digitalWrite(cdPin, LOW); 
    digitalWrite(csPin, LOW); 
-            
+           
    for(i = 0; i < 8080; i++) 
    { 
       SPI.transfer(0xFF); 
@@ -184,56 +177,48 @@ void clearLCD_LM15(void)
 } 
 
 
-void testLCD_LM15(void) 
-{      
+void testLCD_LM15(void) {      
    unsigned int i; 
 
    setCursorLCD_LM15(0,0); 
    digitalWrite(cdPin, LOW); 
    digitalWrite(csPin, LOW); 
 
-   for(i = 0; i < 2020; i++) 
-   {                   //white 
+   for(i = 0; i < 2020; i++) { //white 
       SPI.transfer(0x0F); 
       SPI.transfer(0xFF); 
    }        
-   for(i = 0; i < 2020; i++) 
-   {                   //red 
+   for(i = 0; i < 2020; i++) { //red 
       SPI.transfer(0x0F); 
       SPI.transfer(0x00); 
    }  
     
-   for(i = 0; i < 2020; i++) 
-   {                   //green 
+   for(i = 0; i < 2020; i++) { //green 
       SPI.transfer(0x00); 
       SPI.transfer(0xF0); 
    }        
-   for(i = 0; i < 2020; i++) 
-   {                   //blue 
+   for(i = 0; i < 2020; i++) { //blue 
       SPI.transfer(0x00); 
       SPI.transfer(0x0F); 
    }        
 
    digitalWrite(csPin, HIGH); 
    setCursorLCD_LM15(0,0); 
-    
 } 
 
-void setCursorLCD_LM15(unsigned char y, unsigned char x)
-{
+void setCursorLCD_LM15(unsigned char y, unsigned char x) {
    lcdXpos = x;
    lcdYpos = y;                                  
    if(cursor_LM15)
     (*cursor_LM15)(y, x);   
 }
 
-void getCursorLCD_LM15(unsigned char *y, unsigned char *x)
-{
+void getCursorLCD_LM15(unsigned char *y, unsigned char *x) {
    *x = lcdXpos;
    *y = lcdYpos;
 }
   
-void initLCD_LM15(){
+void initLCD_LM15(unsigned char contrast) {
   pinMode(csPin, OUTPUT);      // sets the digital pin as output
   pinMode(cdPin, OUTPUT);      // sets the digital pin as output
   pinMode(resetPin, OUTPUT);      // sets the digital pin as output
@@ -248,11 +233,11 @@ void initLCD_LM15(){
   delay(10); 
   digitalWrite(cdPin, HIGH); 
   digitalWrite(csPin, LOW); 
-    
-  for(i = 0; i < sizeof(initData_lm15); i++) 
-  { 
-    SPI.transfer(initData_lm15[i]);   // send initialization data 
+
+  for(i = 0; i < sizeof(initData_lm15); i++) { 
+    SPI.transfer(pgm_read_byte_near(initData_lm15 + i));   // send initialization data 
   } 
+
   delay(1);        
   digitalWrite(csPin, HIGH); 
   delay(1); 
@@ -276,44 +261,39 @@ void initLCD_LM15(){
   digitalWrite(csPin, HIGH); 
   digitalWrite(cdPin, LOW); 
 
-  setContrast_LM15(30);  //setting contrast
+  setContrast_LM15(contrast);  //setting contrast
   cursor_LM15(0,0);      //setting cursor to 0,0
   clearLCD_LM15();       //clear lcd with white color
   }  
 
   void rectLCD_LM15(unsigned char h, unsigned char w, unsigned char x, unsigned char y, unsigned int color) {
-   byte i, j; 
+  byte i, j; 
 
-   setCursorLCD_LM15(y,x); 
-   digitalWrite(cdPin, LOW); 
-   digitalWrite(csPin, LOW); 
+  setCursorLCD_LM15(y,x); 
+  digitalWrite(cdPin, LOW); 
+  digitalWrite(csPin, LOW); 
 
   if(80 < (h+y)) h = 80-y;
   if(101 < (w+x)) w = 101-x;
 
-  for(j=0; j < h; j++) {  
-     setCursorLCD_LM15(y,x); 
-     digitalWrite(cdPin, LOW); 
-     digitalWrite(csPin, LOW);  
+  for(j = 0; j < h; j++) {  
+    setCursorLCD_LM15(y,x); 
+    digitalWrite(cdPin, LOW); 
+    digitalWrite(csPin, LOW);  
 
-     for(i = 0; i < w; i++) 
-     {                    
-        SPI.transfer(color >> 8); 
-        SPI.transfer(color & 0xFF); 
-     }  
-     digitalWrite(csPin, HIGH); 
-     y = y+1;
+    for(i = 0; i < w; i++) 
+    {                    
+       SPI.transfer(color >> 8); 
+       SPI.transfer(color & 0xFF); 
+    }  
+    digitalWrite(csPin, HIGH); 
+    y = y+1;
   }  
-       
-
-//   digitalWrite(csPin, HIGH); 
-   setCursorLCD_LM15(0,0); 
+  setCursorLCD_LM15(0,0); 
   }
 
-void textLCD_LM15(char *c, unsigned int colortext, unsigned int colorbg)
-{                
-   unsigned char *pFont;
-   unsigned char i, j;  
+void textLCD_LM15(char *c, unsigned int colortext, unsigned int colorbg) {                
+   unsigned char pFont;
    unsigned char x, y, value, mask;
       
    getCursorLCD_LM15(&y, &x);
@@ -324,11 +304,13 @@ void textLCD_LM15(char *c, unsigned int colortext, unsigned int colorbg)
       x += 8;
       digitalWrite(cdPin, LOW);
       digitalWrite(csPin, LOW);
-      pFont = &charMap[((unsigned int)(*c) - 32) * 14];            
-      for(i = 0; i < 14; i++) {
-         value = *pFont;    
+      unsigned int ptr = (unsigned int) &charMap + ((unsigned int)(*c) - 32) * 14;
+
+      for(byte i = 0; i < 14; i++) {
+         pFont = pgm_read_byte_near(ptr++);
+         value = pFont;    
          mask = 0x80;
-         for(j = 0; j < 8; j++) {
+         for(byte j = 0; j < 8; j++) {
             if(value & mask) {
                SPI.transfer(colortext >> 8);
                SPI.transfer(colortext & 0xFF);
@@ -339,16 +321,112 @@ void textLCD_LM15(char *c, unsigned int colortext, unsigned int colorbg)
             }
             mask >>= 1;
          }
-         pFont++;
       }               
       digitalWrite(csPin, HIGH);
       c++;
    }
 }
 
-void newlineLCD_LM15(){
+void newlineLCD_LM15() {
   unsigned char x, y;
   getCursorLCD_LM15(&y, &x);
   y += 12;
   setCursorLCD_LM15(y,x);
+}
+
+void drawPixelLCD_LM15(unsigned char y, unsigned char x, unsigned int color) {
+  setCursorLCD_LM15(y,x);
+
+  digitalWrite(cdPin, LOW); 
+  digitalWrite(csPin, LOW); 
+
+  SPI.transfer(color >> 8);
+  SPI.transfer(color & 0xFF);
+  //setCursorLCD_LM15(0,0);
+  digitalWrite(csPin, HIGH);
+}
+
+void drawLineLCD_LM15(int x1, int y1, int x2, int y2, unsigned int color)
+{
+   signed int  x, y, addx, addy, dx, dy;
+   signed long P;
+   byte i;
+   dx = abs((signed int)(x2 - x1));
+   dy = abs((signed int)(y2 - y1));
+   x = x1;
+   y = y1;
+
+   if(x1 > x2)
+      addx = -1;
+   else
+      addx = 1;
+   if(y1 > y2)
+      addy = -1;
+   else
+      addy = 1;
+
+   if(dx >= dy) {
+      P = 2*dy - dx;
+
+      for(i=0; i<=dx; ++i) {
+         drawPixelLCD_LM15(y, x, color);
+         if(P < 0) {
+            P += 2*dy;
+            x += addx;
+         }
+         else {
+            P += 2*dy - 2*dx;
+            x += addx;
+            y += addy;
+         }
+      }
+   }
+   else {
+      P = 2*dx - dy;
+
+      for(i=0; i<=dy; ++i) {
+         drawPixelLCD_LM15(y, x, color);
+
+         if(P < 0) {
+            P += 2*dx;
+            y += addy;
+         }
+         else {
+            P += 2*dx - 2*dy;
+            x += addx;
+            y += addy;
+         }
+      }
+   }
+}
+
+void drawCircleLCD_LM15(int x, int y, int radius, int fill, unsigned int color) {
+   signed int a, b, P;
+   a = 0;
+   b = radius;
+   P = 1 - radius;
+
+   do {
+      if(fill == 1) {
+         drawLineLCD_LM15(x-a, y+b, x+a, y+b, color);
+         drawLineLCD_LM15(x-a, y-b, x+a, y-b, color);
+         drawLineLCD_LM15(x-b, y+a, x+b, y+a, color);
+         drawLineLCD_LM15(x-b, y-a, x+b, y-a, color);
+      }
+      else {
+         drawPixelLCD_LM15(b+y, a+x, color);
+         drawPixelLCD_LM15(a+y, b+x, color);
+         drawPixelLCD_LM15(b+y, x-a, color);
+         drawPixelLCD_LM15(a+y, x-b, color);
+         drawPixelLCD_LM15(y-a, b+x, color);
+         drawPixelLCD_LM15(y-b, a+x, color);
+         drawPixelLCD_LM15(y-b, x-a, color);
+         drawPixelLCD_LM15(y-a, x-b, color);
+      }
+
+      if(P < 0)
+         P+= 3 + 2*a++;
+      else
+         P+= 5 + 2*(a++ - b--);
+    } while(a <= b);
 }

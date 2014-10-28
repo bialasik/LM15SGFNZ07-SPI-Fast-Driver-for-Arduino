@@ -16,25 +16,25 @@ I have changed connection to hardware SPI. Also, I've found Elektor C code, whic
 Cool story bro, but where I must put files?
 ------
 1. Create the directory in _libraries_ in Arduino main folder
-2. Just put here lm15_lcd.c and lm15_lcd.h files
+2. Just put here lcd_lm15.c and lcd_lm15.h files
 3. It's done!
 
 How to wire Arduino with LM15SGFNZ07 LCD?
 ------
 ![LCD](http://i.imgur.com/jL4YGl2.png)
 
-| PIN LCD        |   PIN ARDUINO           |
+| PIN LCD       | PIN ARDUINO   |
 |:-------------:|:-------------:|
-| 1 | 10 |
-| 2 | 8 |
-| 3 | 6 |
-| 4 | 13 |
-| 5 | 11 |
-| 6 | 3.3V |
-| 7 | GND |
-| 8 | 3.3V |
-| 9 | GND |
-| 10 | 3.3V |
+| 1             | 10            |
+| 2             | 8             |
+| 3             | 6             |
+| 4             | 13            |
+| 5             | 11            |
+| 6             | 3.3V          |
+| 7             | GND           |
+| 8             | 3.3V          |
+| 9             | GND           |
+| 10            | 3.3V          |
 
 How to use it?
 ------
@@ -44,12 +44,15 @@ Simplest Arduino sketch
 #include <SPI.h>
 #include <lcd_lm15.h>
 
-void setup() { 
-  initLCD_LM15();
-  textLCD_LM15("Kocham Kasie", RED, WHITE);  
+void setup() 
+{ 
+  initLCD_LM15(32);
+  textLCD_LM15("Kocham Kasie", ORANGE, BLUE);
 } 
   
-void loop() {
+void loop() 
+{ 
+
 }
 ```
 Ok, it's simple! But I want to do something more than text writing. Maybe some documentation, please?
@@ -57,12 +60,12 @@ Ok, it's simple! But I want to do something more than text writing. Maybe some d
 All right! Here is the **list of useful avalible functions** (2014.10.27):
 
 ```cpp
-initLCD_LM15();
+initLCD_LM15(CONTRAST_NUMBER_FROM_0_TO_255_DEFAULT_IS_32);
 ```
 Initialize the display (send init data, set contrast and clear LCD with white color).
 
 ```cpp
-setContrast_LM15(CONTRAST_NUMBER_FROM_0_TO_255_DEFAULT_IS_40);
+setContrast_LM15(CONTRAST_NUMBER_FROM_0_TO_255_DEFAULT_IS_32);
 ```
 Set contrast. (wow such discovery).
 
@@ -101,15 +104,50 @@ newlineLCD_LM15();
 ```
 Go to new line.
 
+```cpp
+drawPixelLCD_LM15(Y_POSITION, X_POSITION, COLOR);
+```
+Draw a single pixel on the screen.
+
+```cpp
+drawLineLCD_LM15(START_POINT_X, START_POINT_Y, END_POINT_X, END_POINT_Y, COLOR);
+```
+Draw a line.
+
+```cpp
+drawCircleLCD_LM15(CENTER_X, CENTER_Y, RADIUS, FILL, COLOR);
+```
+Draw a circle. FILL: 0 - off, 1 - on
+
+Aaaaand... color list!
+```cpp
+RED
+GREEN
+BLUE
+YELLOW
+MAGENTA
+CYAN
+BLACK
+WHITE
+ORANGE
+GREY
+PINK
+LIME
+```
+
+I love blue color!
+
 TO DO list
 ------
-1. Drawing circles
-2. Drawing lines
+1. ~~Drawing circles~~ Done!
+2. ~~Drawing lines~~ Done!
 3. Drawing frames
-4. More colors!
+4. ~~More colors!~~ Done!
 5. Different fonts (?)
 6. Set pins on LCD init, not in code
-7. ???
+7. Drawing ovals
+8. Drawing text with transparent background
+9. ???
 
 Write to me if you want!
 ------
